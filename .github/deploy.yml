@@ -1,0 +1,37 @@
+name: CloudPanel Python Deployment
+
+on:
+  push:
+    branches:
+      - main  # Cambia a 'master' si es el nombre de tu rama principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # 1. Navegar al directorio de la aplicación
+            # CloudPanel usa por defecto /home/USUARIO_PRINCIPAL/htdocs/DOMINIO
+            # Asegúrate de ajustar 'USUARIO_PRINCIPAL' al nombre real del dueño del sitio
+            cd /home/${{ secrets.SSH_USER }}/htdocs/${{ secrets.DOMAIN_NAME }}
+
+            # 2. Bajar los últimos cambios de GitHub
+            git pull origin main
+
+            # 3. Actualizar dependencias dentro del entorno virtual de CloudPanel
+            if command -v uv &> /dev/null; then
+                uv sync --frozen
+            else
+                echo "uv no está instalado en el servidor. Instalando dependencias con pip..."
+                source venv/bin/activate && pip install -r requirements.txt
+            fi
+
+            # 4. Reiniciar la aplicación de Python
+            clp-python-app-restart --domain=${{ secrets.DOMAIN_NAME }}
