@@ -1,6 +1,6 @@
 import json
 from typing import Any
-from meta import assitant_host
+from lib.vars import assitant_host
 
 import httpx
 import typer

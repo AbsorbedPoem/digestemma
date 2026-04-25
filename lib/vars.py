@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 env = load_dotenv('.env')
 
 if env:
-    model = 'qwen3.5-reviews'
+    genai_model = 'qwen3.5-reviews'
     assitant_host = os.getenv('ASSISTANT_HOST')
     model_host = os.getenv('MODEL_HOST')
     DB_NAME = os.getenv('DB_NAME')
@@ -16,3 +16,7 @@ else:
     print("Error: No se pudo encontrar el archivo .env")
     exit()
 
+
+from google.genai import Client
+
+client:Client = Client(api_key=os.getenv('GOOGLE_AI_API_KEY'))

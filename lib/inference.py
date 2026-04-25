@@ -1,10 +1,6 @@
 # from ollama import chat, ChatResponse, Tool, Message
 
-from meta import model
-from lib.db import execute_select_to_json
-import json
-from client import client
-from google.genai.types import GenerateContentConfig, ThinkingConfig
+from lib.vars import client
 
 
 # tools: list[dict] = [
@@ -32,16 +28,11 @@ from google.genai.types import GenerateContentConfig, ThinkingConfig
 async def Inference(prompt):
 
     response = await client.aio.models.generate_content(
-            model = 'gemma-4-e4b',
-            contents = [prompt],
-            config = GenerateContentConfig(
-                system_instruction='I say high, you say low',
-                max_output_tokens=3,
-                thinking_config=ThinkingConfig(
-                    
-                )
-            ),
+            model = 'gemma-4-26b-a4b-it',
+            contents = [prompt]
         )
+
+    return response.text
 
     # if response.message.tool_calls:
     #     tool_response:Message = json.loads(execute_select_to_json(response.message.tool_calls[0].function.arguments['query']))
@@ -61,4 +52,3 @@ async def Inference(prompt):
     #     )
     #     return responseWithTool
 
-    return response
