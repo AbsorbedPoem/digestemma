@@ -17,21 +17,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            # 1. Navegar al directorio de la aplicación
-            # CloudPanel usa por defecto /home/USUARIO_PRINCIPAL/htdocs/DOMINIO
-            # Asegúrate de ajustar 'USUARIO_PRINCIPAL' al nombre real del dueño del sitio
             cd /home/${{ secrets.SSH_USER }}/htdocs/${{ secrets.DOMAIN_NAME }}
-
-            # 2. Bajar los últimos cambios de GitHub
+            
             git pull origin main
 
-            # 3. Actualizar dependencias dentro del entorno virtual de CloudPanel
-            if command -v uv &> /dev/null; then
-                uv sync --frozen
-            else
-                echo "uv no está instalado en el servidor. Instalando dependencias con pip..."
-                source venv/bin/activate && pip install -r requirements.txt
-            fi
+            uv sync --frozen
 
-            # 4. Reiniciar la aplicación de Python
             clp-python-app-restart --domain=${{ secrets.DOMAIN_NAME }}
